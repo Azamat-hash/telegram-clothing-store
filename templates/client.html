@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Магазин одежды</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .product { border: 1px solid #ddd; padding: 15px; margin: 10px 0; }
+        .order-btn { background: #28a745; color: white; padding: 10px; border: none; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>🛍️ Магазин одежды</h1>
+    <p>Добро пожаловать в наш магазин!</p>
+    
+    <div id="products">
+        <p>Загрузка товаров...</p>
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        
+        // Загрузка товаров
+        fetch('/api/products')
+            .then(response => response.json())
+            .then(products => {
+                const container = document.getElementById('products');
+                if (products.length === 0) {
+                    container.innerHTML = '<p>Товаров пока нет</p>';
+                    return;
+                }
+                
+                container.innerHTML = products.map(product => `
+                    <div class="product">
+                        <h3>${product.name}</h3>
+                        <p>${product.description || 'Описание отсутствует'}</p>
+                        <p><strong>Цена: ${product.price} ₽</strong></p>
+                        <button class="order-btn" onclick="orderProduct(${product.id})">
+                            📞 Заказать
+                        </button>
+                    </div>
+                `).join('');
+            });
+        
+        function orderProduct(productId) {
+            tg.openTelegramLink(`https://t.me/your_username?start=order_${productId}`);
+            tg.showPopup({
+                title: 'Заказ принят!',
+                message: 'Свяжитесь с продавцом для подтверждения заказа'
+            });
+        }
+    </script>
+</body>
+</html>
