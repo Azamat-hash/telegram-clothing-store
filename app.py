@@ -29,6 +29,15 @@ def get_products():
     } for p in products])
 
 if __name__ == '__main__':
+    if os.environ.get('START_BOT', 'False').lower() == 'true':
+    def run_bot():
+        from bot.telegram_bot import run_bot
+        run_bot()
+    
+    import threading
+    bot_thread = threading.Thread(target=run_bot, daemon=True)
+    bot_thread.start()
+    print("✅ Telegram bot started in background thread")
     with app.app_context():
         db.create_all()
     port = int(os.environ.get('PORT', 5000))
